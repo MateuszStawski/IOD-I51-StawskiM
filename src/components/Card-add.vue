@@ -66,12 +66,12 @@
             {{ items }} <br>
           </div>
         </div>
-          <router-link to="/view-list" class="redirectToViewList">
-              <button class="btn btn-dark btn-lg float-right">Wyświetl listę</button>
-          </router-link>
-          <div class="resetButton" @click="reloadPage">
-            By dodać nowy plik/URL, kliknij mnie w celu odświeżenia strony
-          </div>
+        <router-link to="/view-list" class="redirectToViewList">
+          <button class="btn btn-dark btn-lg float-right">Wyświetl listę</button>
+        </router-link>
+        <div class="resetButton" @click="reloadPage">
+          By dodać nowy plik/URL, kliknij mnie w celu odświeżenia strony
+        </div>
       </div>
   </div>
 </div>
@@ -96,7 +96,8 @@
       isVisible: false,
       importCanceledItemsNumbers: "",
       importCanceledItems: [],
-      importAcceptedItemsNumbers: ""
+      importAcceptedItemsNumbers: "",
+      pravnaUrl: this.pravnaUrl
     }
   },
   methods: {
