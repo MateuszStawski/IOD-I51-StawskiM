@@ -37,10 +37,10 @@
         <button type="submit" v-if="addingStatus" class="btn btn-dark btn-lg">Dodawanie...</button>
       </div>
     </form>
-    <div class="setPagination">
-      <label>
+    <div class="importPanel">
+      <h4>
         Import z pliku
-      </label>
+      </h4>
       <input 
         type="file"
         id="avatar" 
@@ -49,15 +49,37 @@
         accept=".txt, .csv"
         @change="sendFile"
         />
+      <div class="importPage" v-if="displayImportPage">
+        <label>
+          Status:
+        </label>
+        <br>
+        <div class="acceptedItems">
+          Liczba stron zaakceptowanych <br>
+          {{ importAcceptedItemsNumbers }} <br>
+        </div>
+        <div class="canceledItems">
+          Liczba stron odrzuconych <br>
+          {{ importCanceledItemsNumbers }} <br>
+          Strony odrzucone <br>
+          <div class="iterateElements" v-for="items in importCanceledItems" :key="items">
+            {{ items }} <br>
+          </div>
+        </div>
+          <router-link to="/view-list" class="redirectToViewList">
+              <button class="btn btn-dark btn-lg float-right">Wyświetl listę</button>
+          </router-link>
+          <div class="resetButton" @click="reloadPage">
+            By dodać nowy plik/URL, kliknij mnie w celu odświeżenia strony
+          </div>
       </div>
-      <div class="importPage" v-if="displayImportPage"></div>
   </div>
+</div>
 
   </template>
 
 
-  <script>
-
+<script>
   
   export default {
   data () {
@@ -68,27 +90,69 @@
       improperUrl: false,
       duplicatePage: false,
       displayServerError: false,
-      displayFileNamePreview: false, 
       httpsMissing: false,
       fileContent: "",
-      fileName: "",
       displayImportPage: false,
-      isVisible: false
+      isVisible: false,
+      importCanceledItemsNumbers: "",
+      importCanceledItems: [],
+      importAcceptedItemsNumbers: ""
     }
   },
   methods: {
-      sendFile(event) {
+    reloadPage() {
+      location.reload()
+    },
+    async receiveImportData() {
+      var continueChecking = true
+
+      while (continueChecking) {
+        try {
+            var urlId = localStorage.getItem('importId')
+            var response = await fetch("http://54.37.234.76:8081/import/status/"+ urlId , {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              "Access-Control-Allow-Origin": "*",
+              "Access-Control-Allow-Methods": "*",
+              "Access-Control-Allow-Headers": "*"
+            }
+            }).then(response => response.json()) 
+
+              setTimeout(() => {
+              console.log("Delayed for 1 second.");
+              }, 5000)
+          
+            if (response.id ==  urlId) {
+              console.log(response.id)
+              this.importAcceptedItemsNumbers = response.iloscZaakceptowanych
+              this.importCanceledItemsNumbers = response.iloscOdrzuconych
+              this.importCanceledItems = response.odrzucone
+              this.addingStatus = false
+              continueChecking = false
+            }
+          }
+          catch (error) {
+            this.errorMessage = error;
+            console.error('There was an error!', error)
+            this.addingStatus = false
+          }
+        }
+        
+    },
+
+    async sendFile(event) {
         const file = event.target.files[0]
-        this.fileName = file.name
-        this.displayFileNamePreview = true
+        this.displayImportPage = true
+        this.addingStatus = true
 
         let reader = new FileReader();
 
-        reader.onload = function(e) {
+        reader.onload = async function(e) {
             let resultTab = []
             resultTab = e.currentTarget.result
               try {
-                var response = fetch("http://54.37.234.76:8081/company/add-multiple", {
+                var response = await fetch("http://54.37.234.76:8081/company/add-multiple", {
                 method: "POST",
                 headers: {
                   "Content-Type": "application/json",
@@ -101,19 +165,19 @@
                   list: resultTab
                 }),
                }).then(response => response.json())
-               let responseData = response
-               console.log(responseData)
               }
               catch (error) {
                   this.errorMessage = error;
                   console.error('There was an error!', error)
                   this.addingStatus = false
               }
+              localStorage.setItem("importId", response.importId)
         }
-
         reader.readAsText(file)
 
+        this.receiveImportData()
       },
+
       async login(e) {
         
         this.addingStatus = true
@@ -259,7 +323,26 @@
         float: right;
         padding: 2%;
     }
-
+  .acceptedItems {
+    color: #00D100;
+    padding-top: 1%;
+  }
+  .canceledItems {
+    color: red;
+    padding-bottom: 2%;
+  }
+  .importPanel {
+    padding-top: 3%;
+  }
+  .redirectToViewList {
+    padding-top:1%;
+  }
+  .resetButton {
+    padding-top:5%;
+  }
+  .resetButton:hover{
+    cursor: pointer;
+  }
 </style>
 
 
