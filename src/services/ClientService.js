@@ -14,7 +14,6 @@ class ClientService {
                 data: {
                     token: localStorage.getItem('token'),
                     status: localStorage.getItem('filter'), // This is the body part
-                    pageNumber: localStorage.getItem('pageNumber'),
                 }
               });
         }

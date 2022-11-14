@@ -100,6 +100,7 @@
                  displayNumberOfElementsError: false,
                  displayWrongPageNumberError: false,
                  pageNumber: 1,
+                 pravnaUrl: this.pravnaUrl
            }
         },
         watch: {
@@ -125,7 +126,7 @@
                 localStorage.setItem('pageNumber', this.pageNumber)
 
                 try {
-                    var response = await fetch("http://54.37.234.76:8081/company/list", {
+                    var response = await fetch(pravnaUrl+"company/list", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -165,14 +166,14 @@
                             this.displayNumberOfElementsError = false
 
                             if (response.data.totalElements === 0) {
-                            this.displayEmptyListError = true
-                            this.displayServerError = false
-                            this.displayNumberOfElementsError = false
-                        }
-                        if (response.data.totalElements !== 0 && response.data.numberOfElements === 0) {
-                            this.displayNumberOfElementsError = true
-                            this.displayEmptyListError = false
-                        }
+                                this.displayEmptyListError = true
+                                this.displayServerError = false
+                                this.displayNumberOfElementsError = false
+                            }
+                            if (response.data.totalElements !== 0 && response.data.numberOfElements === 0) {
+                                this.displayNumberOfElementsError = true
+                                this.displayEmptyListError = false
+                            }
                         }
                         catch {
                             this.displayServerError = true

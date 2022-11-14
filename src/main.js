@@ -6,10 +6,11 @@ import VueResource from "vue-resource"
 import '@/assets/css/main.css'
 
 
+let app = createApp(App)
 
+app.config.globalProperties.pravnaUrl = 'http://54.37.234.76:8081/'
 
-
-createApp(App).use(router)
+app.use(router)
     .mount('#app')
     .use(router)
     .use(VueResource)
