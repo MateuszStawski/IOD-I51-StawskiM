@@ -17,8 +17,8 @@
               <label id="showPasswordLabel" @click="markCheckbox" class="showPasswordLabel"> Pokaż hasło </label>
           </div> 
           </div>
-          <button v-if="!loginStatus" type="submit" class="btn btn-dark btn-lg">Zaloguj się</button>
-          <button v-if="loginStatus" type="submit" class="btn btn-dark btn-lg">Logowanie...</button>
+          <button v-if="!loginStatus" type="submit" class="log-btn">Zaloguj się</button>
+          <button v-if="loginStatus" type="submit" class="log-btn">Logowanie...</button>
       </form>
     </div>
   
@@ -103,6 +103,17 @@
   </script>
   
   <style>
+    .log-btn{
+    padding: 0.5rem 1rem;
+    font-size: 1.25rem;
+    line-height: 1.5;
+    border-radius: 0.3rem;
+    color: #fff;
+    background-color: #343a40;
+    border-color: #343a40;
+    border: 1px solid transparent;
+    transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+  }
 
   .checkboxClass {
     width: 5%;
