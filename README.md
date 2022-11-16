@@ -1,8 +1,8 @@
-# infinite-tech
+# Pravna frontend
 
 <b>Website url:<b>
 
-gabazaba.pl
+
 
 
 ## Project setup
