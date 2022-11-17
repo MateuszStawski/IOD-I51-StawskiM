@@ -75,6 +75,7 @@
           By dodać nowy plik/URL, kliknij mnie w celu odświeżenia strony
         </div>
       </div>
+      <div class="scroll-pad" id="scrollHere"> </div>
   </div>
 </div>
 
@@ -106,6 +107,10 @@
     reloadPage() {
       location.reload()
     },
+    scrollToId() {
+      let element = document.getElementById("scrollHere");
+      element.scrollIntoView({behavior: "smooth", block: "start"});
+    },
     async receiveImportData() {
       var continueChecking = true
 
@@ -131,11 +136,13 @@
               this.importAcceptedItemsNumbers = response.iloscZaakceptowanych
               this.importCanceledItemsNumbers = response.iloscOdrzuconych
               this.importCanceledItems = response.odrzucone
+              this.scrollToId()
               if (this.importCanceledItemsNumbers === 0) {
                 this.importCanceledItems.push("Brak stron odrzuconych")
               }
               this.addingStatus = false
               continueChecking = false
+
             }
           }
           catch (error) {
@@ -144,9 +151,7 @@
             this.addingStatus = false
           }
         }
-        
     },
-
     async sendFile(event) {
         const file = event.target.files[0]
         this.displayImportPage = true
@@ -224,20 +229,19 @@
           const stringError = String(error)
           this.addingStatus = false
 
-          if (stringError.includes("COMPANY NOT FOUND")) {
+          if (stringError.includes("COMPANY NOT FOUND") || stringError.includes("STRONA NIE ISTNIEJE")) {
             this.improperUrl = true
             this.displayInfoTab = false
             this.duplicatePage = false
             this.displayServerError = false
           }
-          if (stringError.includes("COMPANY EXISTS")) {
+          if (stringError.includes("COMPANY EXISTS") || stringError.includes("STRONA JUŻ")) {
             this.duplicatePage = true
             this.displayInfoTab = false
             this.improperUrl = false
             this.displayServerError = false
           }
           if (stringError.includes("Failed to fetch")) {
-            console.log("x")
             this.displayServerError = true
             this.displayInfoTab = false
             this.imprtoperUrl = false
@@ -265,6 +269,9 @@
 </script>
 
 <style>
+.scroll-pad {
+  padding-top: 10%;
+}
     .view-btn{
     padding: 0.5rem 1rem;
     width: 15%;
@@ -364,6 +371,8 @@
   }
   .resetButton {
     padding-top:5%;
+    color: black;
+    font-size: 25px;
   }
   .resetButton:hover{
     cursor: pointer;
