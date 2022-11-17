@@ -3,8 +3,11 @@
     <!-- Navigation -->
     <nav class="navbar shadow bg-white rounded justify-content-between flex-nowrap flex-row fixed-top">
       <div class="container">
-        <a class="navbar-brand float-left" target="_blank">
-        </a>
+        <ul class="nav navbar-nav flex-row float-left">
+          <li class="nav-item">
+            <router-link v-if="showLogoutButton" class="nav-link pr-3" to="/main">Strona główna</router-link>
+          </li>
+        </ul>
         <ul class="nav navbar-nav flex-row float-right">
           <li class="nav-item">
             <router-link v-if="showLogoutButton" class="nav-link pr-3" to="/log-in" @click="clearSessionStorage">Wyloguj</router-link>
@@ -69,7 +72,9 @@
   text-align: center;
   color: #62478a;
 }
-
+a, li {
+  list-style-type: none;
+}
 .vertical-center {
 position: absolute;
 top: 50%;

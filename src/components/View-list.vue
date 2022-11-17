@@ -1,12 +1,13 @@
 <template>
     <div class = "container-display">
-        <div class="addNewCard">
+        <label class="scrollable" @click="scrollDown"> Przewiń lub kliknij mnie </label>
+        <div class="addNewCard" >
             <router-link to="/card-add">
                 <button class="add-button float-right">Dodaj nowy</button>
             </router-link>
         </div>
-        <h1 class = "text-center">Lista firm</h1>
-        <div class="filtersTab" @click="test">
+        <h1 class = "text-center" >Lista firm</h1>
+        <div class="filtersTab" >
             <multiselect 
                 v-model="selectedFilter" 
                 :options="options"
@@ -35,10 +36,10 @@
         <div v-if="!displayEmptyListError" class="display-error"></div>
         <div v-if="displayEmptyListError" class="display-error"> Baza danych jest pusta </div>
         <div v-if="!displayNumberOfElementsError" class="display-error"></div>
-        <div v-if="displayNumberOfElementsError" class="display-error"> Nie można zmienić strony </div>
+        <div v-if="displayNumberOfElementsError" class="display-error"> Nie można zmienić strony, strona byłaby pusta </div>
         <div v-if="!displayWrongPageNumberError" class="display-error"></div>
         <div v-if="displayWrongPageNumberError" class="display-error"> Wpisano niepoprawny numer strony </div>
-        <table class="table table=striped">
+        <table class="table table=striped" id="scrollHere"> 
             <thead>
                 <th>ID</th>
                 <th>URL</th>
@@ -48,12 +49,12 @@
                 <th>Status</th>
                 <th>Akcje</th>
             </thead>
-            <tbody>
+            <tbody >
                 <tr v-for="client in clients" v-bind:key="client.id">
                     <td>{{client.id}}</td>
                     <td>{{client.url}}</td>
                     <td>
-                        <img class="logoImg" v-bind:src=client.logoPath onerror="src=' https://i.imgur.com/hfM1J8s.png' "/>
+                        <img class="logoImg" v-bind:src=client.logoPath />
                         <img class="redirectToLogo" v-if="displayInfoIcon" @click="redirectToLogoPage(client.logoPath)" width="17" height="17" src='../img/info_icon.svg' />
                     </td>
                     <td>{{client.phoneNumber}}</td>
@@ -104,19 +105,19 @@
            }
         },
         watch: {
-            selectedFilter(newOption, oldOption) {
+            selectedFilter() {
                 localStorage.setItem('filter', this.selectedFilter)
                 this.getClients()
-
-                for (let i=0; i<this.clients.length; i++) {
-                    if (this.clients[i].logoPath === 'e') {
-                        this.clients[i].logoPath = "https://i.imgur.com/hfM1J8s.png"
-                    }
-                }
+                this.scrollDown()
             }
         },
         methods: {
-            async setPage(event) {
+            scrollDown() {
+                let element = document.getElementById("scrollHere");
+                element.scrollIntoView({behavior: "smooth", block: "start"});
+
+            },
+            async setPage() {
                 
                 if (this.pageNumber < 1 || this.pageNumber === null || this.pageNumber === undefined || this.pageNumber === "" || isNaN(this.pageNumber)) {
                     this.displayWrongPageNumberError = true
@@ -128,7 +129,7 @@
 
 
                 localStorage.setItem('pageNumber', this.pageNumber)
-
+                
                 try {
                     var response = await fetch("http://54.37.234.76:8081/company/list", {
                     method: "POST",
@@ -144,12 +145,16 @@
                         pageNumber: this.pageNumber
                     }),
                     }).then(response => response.json())
+                    if (response.content.length === 0) {
+                        this.displayNumberOfElementsError = true
+
+                        }
                     }
                     catch (error) {
-                    //this.errorMessage = error;
-                    console.error('There was an error!', error)
-                    const stringError = String(error)
-                    //this.addingStatus = false
+                        //this.errorMessage = error;
+                        console.error('There was an error!', error)
+                        const stringError = String(error)
+                        //this.addingStatus = false
 
                     if (stringError.includes("Failed to fetch")) {
                         this.displayServerError = true
@@ -158,6 +163,7 @@
                     }
 
                     this.getClients()
+                    this.scrollDown()
             },
             redirectToLogoPage(page) {
                 window.open(page)
@@ -228,7 +234,7 @@
                         this.displayServerError = true
                         }
                     }
-                    this.getClients(this.selectedFilter)
+                    this.getClients()
             }
         },
         created(){
@@ -250,6 +256,9 @@
 <style src="../assets/css/vue-multiselect.min.css"></style>
 
   <style>
+    .scrollable:hover {
+        cursor: pointer;
+    }
     .add-button{
     width: 20%;
     padding: 0.5rem 1rem;
@@ -264,7 +273,7 @@
   }
     .addNewCard {
         padding-bottom: 5%;
-        padding-top: 35%;
+        padding-top: 42%;
     }
     .container-display {
         text-align: center;
@@ -321,6 +330,9 @@
     .redirectToLogo {
         display: inline-block;
         margin: auto;
+    }
+    .redirectToLogo:hover {
+        cursor: pointer;
     }
     .setPagination {
         width: 25%;
