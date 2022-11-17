@@ -2,7 +2,7 @@
     <div class = "container-display">
         <div class="addNewCard">
             <router-link to="/card-add">
-                <button class="btn btn-dark btn-lg float-right">Dodaj nowy</button>
+                <button class="add-button float-right">Dodaj nowy</button>
             </router-link>
         </div>
         <h1 class = "text-center">Lista firm</h1>
@@ -53,7 +53,7 @@
                     <td>{{client.id}}</td>
                     <td>{{client.url}}</td>
                     <td>
-                        <img class="logoImg" v-bind:src=client.logoPath />
+                        <img class="logoImg" v-bind:src=client.logoPath onerror="src=' https://i.imgur.com/hfM1J8s.png' "/>
                         <img class="redirectToLogo" v-if="displayInfoIcon" @click="redirectToLogoPage(client.logoPath)" width="17" height="17" src='../img/info_icon.svg' />
                     </td>
                     <td>{{client.phoneNumber}}</td>
@@ -107,12 +107,16 @@
             selectedFilter(newOption, oldOption) {
                 localStorage.setItem('filter', this.selectedFilter)
                 this.getClients()
+
+                for (let i=0; i<this.clients.length; i++) {
+                    if (this.clients[i].logoPath === 'e') {
+                        this.clients[i].logoPath = "https://i.imgur.com/hfM1J8s.png"
+                    }
+                }
             }
         },
         methods: {
             async setPage(event) {
-                console.log(this.pageNumber)
-                console.log(event)
                 
                 if (this.pageNumber < 1 || this.pageNumber === null || this.pageNumber === undefined || this.pageNumber === "" || isNaN(this.pageNumber)) {
                     this.displayWrongPageNumberError = true
@@ -126,7 +130,7 @@
                 localStorage.setItem('pageNumber', this.pageNumber)
 
                 try {
-                    var response = await fetch(pravnaUrl+"company/list", {
+                    var response = await fetch("http://54.37.234.76:8081/company/list", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -230,7 +234,7 @@
         created(){
             localStorage.setItem('pageNumber', this.pageNumber)
             this.selectedFilter = "WSZYSTKIE"
-            this.getClients(this.selectedFilter)
+            this.getClients()
         },
         beforeMount() {
             localStorage.setItem('filter',"WSZYSTKIE")
@@ -246,12 +250,21 @@
 <style src="../assets/css/vue-multiselect.min.css"></style>
 
   <style>
-    .btn-lg {
-        width: 15% !important;
-    }
+    .add-button{
+    width: 20%;
+    padding: 0.5rem 1rem;
+    font-size: 1.25rem;
+    line-height: 1.5;
+    border-radius: 0.3rem;
+    color: #fff;
+    background-color: #343a40;
+    border-color: #343a40;
+    border: 1px solid transparent;
+    transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+  }
     .addNewCard {
         padding-bottom: 5%;
-        padding-top: 15%;
+        padding-top: 35%;
     }
     .container-display {
         text-align: center;
@@ -261,6 +274,7 @@
         float: none;
         width: 1600px;
         min-width: 1200px;
+        padding-top: 110%;
     }
     .filtersTab {
         width: 25%;
@@ -300,7 +314,7 @@
     }
     .logoImg {
         width: 200px; 
-        height: 100px;
+        height: 120px;
         padding: 10%;
         margin: auto;
     }

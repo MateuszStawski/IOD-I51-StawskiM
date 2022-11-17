@@ -7,6 +7,8 @@
             Podany URL musi zawierać: <br>
             - http lub https <br>
             - domena (.pl lub .com, itp.) <br>
+            - / (slash) po domenie jest opcjonalny <br>
+            - po domenie nie powinno być dodatkowego tekstu <br>
             <br>
             Przykład: <br>
             https://pravna.pl/ <br>
@@ -33,8 +35,8 @@
         <input type="text" class="form-control-lg" v-model="urlAddress" placeholder="URL" required />   
       </div> 
       <div class="button-panel">
-        <button type="submit" v-if="!addingStatus" class="btn btn-dark btn-lg">Dodaj</button>
-        <button type="submit" v-if="addingStatus" class="btn btn-dark btn-lg">Dodawanie...</button>
+        <button type="submit" v-if="!addingStatus" class="my-btn">Dodaj</button>
+        <button type="submit" v-if="addingStatus" class="my-btn">Dodawanie...</button>
       </div>
     </form>
     <div class="importPanel">
@@ -67,7 +69,7 @@
           </div>
         </div>
         <router-link to="/view-list" class="redirectToViewList">
-          <button class="btn btn-dark btn-lg float-right">Wyświetl listę</button>
+          <button class="view-btn float-right">Wyświetl listę</button>
         </router-link>
         <div class="resetButton" @click="reloadPage">
           By dodać nowy plik/URL, kliknij mnie w celu odświeżenia strony
@@ -124,11 +126,14 @@
               console.log("Delayed for 1 second.");
               }, 5000)
           
-            if (response.id ==  urlId) {
+            if (response.status === 'GOTOWE') {
               console.log(response.id)
               this.importAcceptedItemsNumbers = response.iloscZaakceptowanych
               this.importCanceledItemsNumbers = response.iloscOdrzuconych
               this.importCanceledItems = response.odrzucone
+              if (this.importCanceledItemsNumbers === 0) {
+                this.importCanceledItems.push("Brak stron odrzuconych")
+              }
               this.addingStatus = false
               continueChecking = false
             }
@@ -260,6 +265,18 @@
 </script>
 
 <style>
+    .view-btn{
+    padding: 0.5rem 1rem;
+    width: 15%;
+    font-size: 1.25rem;
+    line-height: 1.5;
+    border-radius: 0.3rem;
+    color: #fff;
+    background-color: #343a40;
+    border-color: #343a40;
+    border: 1px solid transparent;
+    transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+  }
 
 #pre {
   padding-top: 0%;
@@ -297,9 +314,16 @@
     display: inline-block;
     transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
 }
-  .btn-dark {
-    width: 50% !important;
-    justify-content: center;
+  .my-btn{
+    padding: 0.5rem 1rem;
+    font-size: 1.25rem;
+    line-height: 1.5;
+    border-radius: 0.3rem;
+    color: #fff;
+    background-color: #343a40;
+    border-color: #343a40;
+    border: 1px solid transparent;
+    transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
   }
 
   #app {
