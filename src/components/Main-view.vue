@@ -38,7 +38,10 @@ export default {
 <style>
 
 .btn {
-  width: 100%!important;
+  width: 30%!important;
+  text-align: center;
+
+  margin: auto;
 }
 
 .main-container {
