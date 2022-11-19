@@ -4,7 +4,6 @@
             <router-link to="/card-add">
                 <button class="add-button float-right">Dodaj nowy</button>
             </router-link>
-
         <h1 class = "text-center" >Lista firm</h1>
         <div class="filtersTab" >
             <multiselect 
@@ -255,6 +254,12 @@
 <style src="../assets/css/vue-multiselect.min.css"></style>
 
   <style>
+    div {
+    margin-left : 60px;
+  }
+  input {
+ display: inline-block;
+  }
     .scrollable:hover {
         cursor: pointer;
     }
@@ -270,19 +275,6 @@
     border: 1px solid transparent;
     transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
   }
-    .container-display {
-        text-align: center;
-        align-items: center;
-        justify-content: center;
-        display: inline-block;
-        float: none;
-        width: 1600px;
-        min-width: 1200px;
-    }
-    .filtersTab {
-        width: 25%;
-        list-style-type: none;
-    }
     button {
         text-align: center;
         display: inline-block;
