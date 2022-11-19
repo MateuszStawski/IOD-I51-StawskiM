@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-const CLIENT_API_BASE_URL = 'http://localhost:8081/company/list'
+const pravnaUrl = 'http://54.37.234.76:8081/'
 
 
 class ClientService {
@@ -9,7 +9,7 @@ class ClientService {
         {   
             return await axios({
                 method: 'post',
-                url: CLIENT_API_BASE_URL,
+                url: pravnaUrl + 'company/list',
                 headers: {}, 
                 data: {
                     token: localStorage.getItem('token'),

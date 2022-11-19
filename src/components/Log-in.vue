@@ -58,7 +58,7 @@
         e.preventDefault();
   
         try {
-            var response = await fetch("http://localhost:8081/user/login", {
+            var response = await fetch(this.pravnaUrl + "user/login", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

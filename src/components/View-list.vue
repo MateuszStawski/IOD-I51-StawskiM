@@ -129,7 +129,7 @@
                 localStorage.setItem('pageNumber', this.pageNumber)
                 
                 try {
-                    var response = await fetch("http://localhost:8081/company/list", {
+                    var response = await fetch(this.pravnaUrl + "company/list", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -207,7 +207,7 @@
             async sendStatusInfo(status, id) {
 
                 try {
-                    var response = await fetch("http://localhost:8081/company/status", {
+                    var response = await fetch(this.pravnaUrl + "company/status", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",

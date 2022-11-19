@@ -117,7 +117,7 @@
       while (continueChecking) {
         try {
             var urlId = localStorage.getItem('importId')
-            var response = await fetch("http://localhost:8081/import/status/"+ urlId , {
+            var response = await fetch(this.pravnaUrl + "import/status/"+ urlId , {
             method: "GET",
             headers: {
               "Content-Type": "application/json",
@@ -163,7 +163,7 @@
             let resultTab = []
             resultTab = e.currentTarget.result
               try {
-                var response = await fetch("http://localhost:8081/company/add-multiple", {
+                var response = await fetch(this.pravnaUrl + "company/add-multiple", {
                 method: "POST",
                 headers: {
                   "Content-Type": "application/json",
@@ -209,7 +209,7 @@
 
 
         try {
-          var response = await fetch("http://localhost:8081/company/add", {
+          var response = await fetch(this.pravnaUrl + "company/add", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
