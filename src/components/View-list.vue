@@ -1,11 +1,10 @@
 <template>
     <div class = "container-display">
-        <label class="scrollable" @click="scrollDown"> Przewiń lub kliknij mnie </label>
-        <div class="addNewCard" >
+       
             <router-link to="/card-add">
                 <button class="add-button float-right">Dodaj nowy</button>
             </router-link>
-        </div>
+
         <h1 class = "text-center" >Lista firm</h1>
         <div class="filtersTab" >
             <multiselect 
@@ -131,7 +130,7 @@
                 localStorage.setItem('pageNumber', this.pageNumber)
                 
                 try {
-                    var response = await fetch("http://54.37.234.76:8081/company/list", {
+                    var response = await fetch("http://localhost:8081/company/list", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -209,7 +208,7 @@
             async sendStatusInfo(status, id) {
 
                 try {
-                    var response = await fetch("http://54.37.234.76:8081/company/status", {
+                    var response = await fetch("http://localhost:8081/company/status", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -271,10 +270,6 @@
     border: 1px solid transparent;
     transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
   }
-    .addNewCard {
-        padding-bottom: 5%;
-        padding-top: 42%;
-    }
     .container-display {
         text-align: center;
         align-items: center;
@@ -283,7 +278,6 @@
         float: none;
         width: 1600px;
         min-width: 1200px;
-        padding-top: 110%;
     }
     .filtersTab {
         width: 25%;
