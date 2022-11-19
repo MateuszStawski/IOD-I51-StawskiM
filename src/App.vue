@@ -83,9 +83,9 @@ transform: translate(-50%, -50%);
 }
 
 
-.inner-block {
-  display: inline-block;
+.box {
+  display: flex;
+  justify-content: space-between;
 }
-
 
 </style>
