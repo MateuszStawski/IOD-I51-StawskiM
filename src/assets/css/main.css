@@ -12,11 +12,10 @@
   .App,
   .vue-tempalte,
   .vertical-center {
-    width: 100%;
+    width: 1650px;
     height: 100%;
   }
   .containerDisplay {
-    width: 1600px;
     height: fit-content;
     min-height: 400px;
   }
@@ -29,15 +28,14 @@
   }
   .vertical-center {
     display: table-column;
-    text-align: left;
-
+    text-align: inherit;
     justify-content: center;
     flex-direction: column;    
   }
   .inner-block {
     margin-top: 100px;
-    min-width: 450px;
-    margin-left: 80px;
+    min-width: 1650px;
+    max-width: 1650px;
     margin-bottom: 30px;
     width: fit-content;
     background: #ffffff;

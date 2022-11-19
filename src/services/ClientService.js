@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-const pravnaUrl = 'http://54.37.234.76:8081/'
+const pravnaUrl = 'http://localhost:8081/'
 
 
 class ClientService {

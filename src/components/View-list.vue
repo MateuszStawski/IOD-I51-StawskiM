@@ -32,9 +32,9 @@
         <div v-if="!displayServerError" class="display-error"></div>
         <div v-if="displayServerError" class="display-error"> Problem z serwerem </div>
         <div v-if="!displayEmptyListError" class="display-error"></div>
-        <div v-if="displayEmptyListError" class="display-error"> Baza danych jest pusta </div>
-        <div v-if="!displayNumberOfElementsError" class="display-error"></div>
-        <div v-if="displayNumberOfElementsError" class="display-error"> Nie można zmienić strony, strona byłaby pusta </div>
+        <div v-if="displayEmptyListError" class="display-error"> Brak firm z danym statusem </div>
+        <div v-if="displayNumberOfElementsError" class="display-error"></div>
+        <div v-if="!displayNumberOfElementsError" class="display-error"> Nie można zmienić strony, strona byłaby pusta </div>
         <div v-if="!displayWrongPageNumberError" class="display-error"></div>
         <div v-if="displayWrongPageNumberError" class="display-error"> Wpisano niepoprawny numer strony </div>
         <table class="table table=striped" id="scrollHere"> 
@@ -105,15 +105,15 @@
         watch: {
             selectedFilter() {
                 localStorage.setItem('filter', this.selectedFilter)
+                localStorage.setItem('pageNumber',1)
+                this.pageNumber = 1;
                 this.getClients()
-                this.scrollDown()
             }
         },
         methods: {
             scrollDown() {
                 let element = document.getElementById("scrollHere");
                 element.scrollIntoView({behavior: "smooth", block: "start"});
-
             },
             async setPage() {
                 
@@ -143,9 +143,14 @@
                         pageNumber: this.pageNumber
                     }),
                     }).then(response => response.json())
+                    console.log('KURWAAA')
                     if (response.content.length === 0) {
+                        console.log('ON')
                         this.displayNumberOfElementsError = true
-
+                        }
+                        else{
+                            console.log('OFF')
+                            this.displayNumberOfElementsError = false
                         }
                     }
                     catch (error) {
@@ -161,7 +166,6 @@
                     }
 
                     this.getClients()
-                    this.scrollDown()
             },
             redirectToLogoPage(page) {
                 window.open(page)
@@ -169,16 +173,22 @@
             getClients() {
                     ClientService.getClients().then((response) =>{
                         try {
+                            console.log('COOOOOO')
+                            console.log(response.data.numberOfElements)
                             this.clients = response.data.content;
                             this.displayServerError = false
                             this.displayNumberOfElementsError = false
 
-                            if (response.data.totalElements === 0) {
+                            if (response.data.numberOfElements === 0) {
                                 this.displayEmptyListError = true
                                 this.displayServerError = false
-                                this.displayNumberOfElementsError = false
+                                this.displayNumberOfElementsError = true
                             }
-                            if (response.data.totalElements !== 0 && response.data.numberOfElements === 0) {
+                            else if (response.data.numberOfElements === 0){
+                                this.displayNumberOfElementsError = false
+                                this.displayEmptyListError = true
+                            }
+                            else{
                                 this.displayNumberOfElementsError = true
                                 this.displayEmptyListError = false
                             }
@@ -221,6 +231,17 @@
                         id: id
                     }),
                     }).then(response => response.json())
+                            if (response.data.numberOfElements === 0) {
+                                console.log('ON')
+                                this.displayEmptyListError = true
+                                this.displayServerError = false
+                                this.displayNumberOfElementsError = false
+                            }
+                            else {
+                                console.log('OFF')
+                                this.displayNumberOfElementsError = true
+                                this.displayEmptyListError = false
+                            }
                     }
                     catch (error) {
                     //this.errorMessage = error;
@@ -255,26 +276,26 @@
 
   <style>
     div {
-    margin-left : 60px;
-  }
-  input {
- display: inline-block;
-  }
+        margin-left : 20px;
+    }
+    input {
+        display: inline-block;
+    }
     .scrollable:hover {
         cursor: pointer;
     }
     .add-button{
-    width: 20%;
-    padding: 0.5rem 1rem;
-    font-size: 1.25rem;
-    line-height: 1.5;
-    border-radius: 0.3rem;
-    color: #fff;
-    background-color: #343a40;
-    border-color: #343a40;
-    border: 1px solid transparent;
-    transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
-  }
+        width: 20%;
+        padding: 0.5rem 1rem;
+        font-size: 1.25rem;
+        line-height: 1.5;
+        border-radius: 0.3rem;
+        color: #fff;
+        background-color: #343a40;
+        border-color: #343a40;
+        border: 1px solid transparent;
+        transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+    }
     button {
         text-align: center;
         display: inline-block;
