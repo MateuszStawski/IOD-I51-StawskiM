@@ -1,10 +1,9 @@
 <template>
-        <label class="scrollable" @click="scrollDown"> Przewiń lub kliknij mnie </label>
-        <router-link to="/card-add">
-            <button class="add-button float-right">Dodaj nowy</button>
-        </router-link>
-
-        <div ref="document">
+    <div class = "container-display">
+       
+            <router-link to="/card-add">
+                <button class="add-button float-right">Dodaj nowy</button>
+            </router-link>
         <h1 class = "text-center" >Lista firm</h1>
         <div class="filtersTab" >
             <multiselect 
@@ -130,7 +129,7 @@
                 localStorage.setItem('pageNumber', this.pageNumber)
                 
                 try {
-                    var response = await fetch("http://54.37.234.76:8081/company/list", {
+                    var response = await fetch("http://localhost:8081/company/list", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -208,7 +207,7 @@
             async sendStatusInfo(status, id) {
 
                 try {
-                    var response = await fetch("http://54.37.234.76:8081/company/status", {
+                    var response = await fetch("http://localhost:8081/company/status", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
