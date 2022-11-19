@@ -58,7 +58,7 @@
         e.preventDefault();
   
         try {
-            var response = await fetch("http://54.37.234.76:8081/user/login", {
+            var response = await fetch("http://localhost:8081/user/login", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
