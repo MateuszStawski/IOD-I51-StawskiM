@@ -1,9 +1,8 @@
 <template>
-    <div class = "container-display">
-       
-            <router-link to="/card-add">
-                <button class="add-button float-right">Dodaj nowy</button>
-            </router-link>
+    <div class = "container-display"> 
+        <router-link to="/card-add">
+            <button class="add-button float-right">Dodaj nowy</button>
+        </router-link>
         <h1 class = "text-center" >Lista firm</h1>
         <div class="filtersTab" >
             <multiselect 
@@ -37,6 +36,7 @@
         <div v-if="!displayNumberOfElementsError" class="display-error"> Nie można zmienić strony, strona byłaby pusta </div>
         <div v-if="!displayWrongPageNumberError" class="display-error"></div>
         <div v-if="displayWrongPageNumberError" class="display-error"> Wpisano niepoprawny numer strony </div>
+        <div v-if='displayTotalNumberOfElements' class="display-total-elements"> Liczba elementów dla {{ selectedFilter }}: {{totalNumberOfElements}}</div>
         <table class="table table=striped" id="scrollHere"> 
             <thead>
                 <th>ID</th>
@@ -69,6 +69,17 @@
                             <button class="btn bugButton" @click="setAction(2, client.id)">Błędna grafika</button>
                         </th>
                     </div>
+                    <div v-if="client.status !== 'OCZEKUJE'">
+                        <th>
+                            <button class="btn noActionRed">Ma ®</button>
+                        </th>
+                        <th>
+                            <button class="btn noActionGreen">Nie ma ®</button>
+                        </th>
+                        <th>
+                            <button class="btn noActionOrange">Błędna grafika</button>
+                        </th>
+                    </div>
                 </tr>
             </tbody>
         </table>
@@ -90,16 +101,18 @@
                  clients : [],
                  selectedFilter: "WSZYSTKIE",
                  displayServerError: false,
-                 options: ["WSZYSTKIE", "OCZEKUJE", "MA_R", "NIE_MA_R", "BLEDNA_GRAFIKA"],
                  selectName: "Wybierz",
                  deselectName: "Wybrane",
                  selectedName: "Wybrane",
                  displayInfoIcon: true,
                  displayEmptyListError: false,
                  displayNumberOfElementsError: false,
+                 displayTotalNumberOfElements: true,
                  displayWrongPageNumberError: false,
+                 totalNumberOfElements: this.totalNumberOfElements,
                  pageNumber: 1,
-                 pravnaUrl: this.pravnaUrl
+                 pravnaUrl: this.pravnaUrl,
+                 options: ["WSZYSTKIE", "OCZEKUJE", "MA_R", "NIE_MA_R", "BLEDNA_GRAFIKA"],
            }
         },
         watch: {
@@ -143,13 +156,11 @@
                         pageNumber: this.pageNumber
                     }),
                     }).then(response => response.json())
-                    console.log('KURWAAA')
+
                     if (response.content.length === 0) {
-                        console.log('ON')
                         this.displayNumberOfElementsError = true
                         }
-                        else{
-                            console.log('OFF')
+                    else {
                             this.displayNumberOfElementsError = false
                         }
                     }
@@ -173,8 +184,7 @@
             getClients() {
                     ClientService.getClients().then((response) =>{
                         try {
-                            console.log('COOOOOO')
-                            console.log(response.data.numberOfElements)
+                            this.totalNumberOfElements = response.data.totalElements
                             this.clients = response.data.content;
                             this.displayServerError = false
                             this.displayNumberOfElementsError = false
@@ -232,13 +242,11 @@
                     }),
                     }).then(response => response.json())
                             if (response.data.numberOfElements === 0) {
-                                console.log('ON')
                                 this.displayEmptyListError = true
                                 this.displayServerError = false
                                 this.displayNumberOfElementsError = false
                             }
                             else {
-                                console.log('OFF')
                                 this.displayNumberOfElementsError = true
                                 this.displayEmptyListError = false
                             }
@@ -302,12 +310,12 @@
         padding-right: 1%;
     }
     .acceptButton {
-        background-color: green;
+        background-color: red;
         color: white;
         width: 100px;
     }
     .declineButton {
-        background-color: red;
+        background-color: green;
         color: white;
         width: 100px;
     }
@@ -315,6 +323,18 @@
         background-color: orange;
         color: white;
         width: 140px;
+    }
+    .noActionRed {
+        background-color: #bf9494;
+        color: white
+    }
+    .noActionOrange {
+        background-color: #D8B083;
+        color: white
+    }
+    .noActionGreen {
+        background-color: #75816b;
+        color: white
     }
     h1 {
         padding-bottom: 2%;
@@ -345,6 +365,10 @@
         width: 25%;
         float: right;
         padding: 2%;
+    }
+    .display-total-elements {
+        padding-bottom: 2%;
+        color: green;
     }
 
   </style> 
