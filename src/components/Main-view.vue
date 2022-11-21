@@ -2,11 +2,11 @@
   <div class="main-container">
     <form @submit.prevent="karta">   
       <router-link to="/card-add">
-        <button type="submit" class="btn btn-dark btn-lg btn-block">Dodaj firmę</button>
+        <button type="submit" class="control-btn">Dodaj firmę</button>
       </router-link>
       <div class="divider" />
       <router-link to="/view-list">
-        <button type="submit" class="btn btn-dark btn-lg btn-block">Lista firm</button>
+        <button type="submit" class="control-btn">Lista firm</button>
       </router-link>
     </form>
   </div>
@@ -37,6 +37,19 @@ export default {
 
 <style>
 
+.control-btn{
+    padding: 0.5rem 1rem;
+    width: 15%;
+    font-size: 1.25rem;
+    line-height: 1.5;
+    border-radius: 0.3rem;
+    color: #fff;
+    background-color: #343a40;
+    border-color: #343a40;
+    border: 1px solid transparent;
+    transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+    width: 30%;
+  }
 .btn {
   width: 100%!important;
 }
