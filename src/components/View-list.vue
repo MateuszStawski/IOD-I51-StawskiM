@@ -29,13 +29,13 @@
             />
         </div>
         <div v-if="!displayServerError" class="display-error"></div>
-        <div v-if="displayServerError" class="display-error"> Problem z serwerem </div>
+        <div v-if="displayServerError" class="display-error">  Problem z serwerem </div>
         <div v-if="!displayEmptyListError" class="display-error"></div>
-        <div v-if="displayEmptyListError" class="display-error"> Brak firm z danym statusem </div>
+        <div v-if="displayEmptyListError" class="display-error">  Brak firm z danym statusem </div>
         <div v-if="displayNumberOfElementsError" class="display-error"></div>
-        <div v-if="!displayNumberOfElementsError" class="display-error"> Nie można zmienić strony, strona byłaby pusta </div>
+        <div v-if="!displayNumberOfElementsError" class="display-error">  Nie można zmienić strony, strona byłaby pusta </div>
         <div v-if="!displayWrongPageNumberError" class="display-error"></div>
-        <div v-if="displayWrongPageNumberError" class="display-error"> Wpisano niepoprawny numer strony </div>
+        <div v-if="displayWrongPageNumberError" class="display-error">  Wpisano niepoprawny numer strony </div>
         <div v-if='displayTotalNumberOfElements' class="display-total-elements"> Liczba elementów dla {{ selectedFilter }}: {{totalNumberOfElements}}</div>
         <table class="table table=striped" id="scrollHere"> 
             <thead>
@@ -56,28 +56,47 @@
                         <img class="redirectToLogo" v-if="displayInfoIcon" @click="redirectToLogoPage(client.logoPath)" width="17" height="17" src='../img/info_icon.svg' />
                     </td>
                     <td>{{client.phoneNumber}}</td>
-                    <td>{{client.email}}</td>
+                    <td v-if="client.emails.length!==0 && client.status === 'NIE_MA_R'">
+                        <multiselect 
+                            v-model="emailName" 
+                            :options="client.emails"
+                            placeholder="Wybierz email"
+                            :select-label="selectName"
+                            :selected-label="selectedName"
+                            :deselect-label="deselectName"
+                            :allow-empty="false"
+                            :searchable="false"
+                        >
+                        </multiselect>
+                        <div class="accept-email" @click="setEmail(emailName, client.id)">Potwierdź</div>
+                    </td>
+                    <td v-if="client.emails.length === 0 && client.status === 'NIE_MA_R'">
+                        NOT FOUND
+                    </td>
+                    <td v-if="client.status !== 'NIE_MA_R'">
+                    </td>
+
                     <td>{{client.status}}</td>
                     <div v-if="client.status === 'OCZEKUJE'">
                         <th>
-                            <button class="btn acceptButton" @click="setAction(0, client.id)">Ma ®</button>
+                            <button class="changeStatusBtn acceptButton" @click="setAction(0, client.id)">Ma ®</button>
                         </th>
                         <th>
-                            <button class="btn declineButton" @click="setAction(1, client.id)">Nie ma ®</button>
+                            <button class="changeStatusBtn declineButton" @click="setAction(1, client.id)">Nie ma ®</button>
                         </th>
                         <th>
-                            <button class="btn bugButton" @click="setAction(2, client.id)">Błędna grafika</button>
+                            <button class="changeStatusBtn bugButton" @click="setAction(2, client.id)">Błędna grafika</button>
                         </th>
                     </div>
                     <div v-if="client.status !== 'OCZEKUJE'">
                         <th>
-                            <button class="btn noActionRed">Ma ®</button>
+                            <button class="changeStatusBtn noActionRed">Ma ®</button>
                         </th>
                         <th>
-                            <button class="btn noActionGreen">Nie ma ®</button>
+                            <button class="changeStatusBtn noActionGreen">Nie ma ®</button>
                         </th>
                         <th>
-                            <button class="btn noActionOrange">Błędna grafika</button>
+                            <button class="changeStatusBtn noActionOrange">Błędna grafika</button>
                         </th>
                     </div>
                 </tr>
@@ -109,10 +128,12 @@
                  displayNumberOfElementsError: false,
                  displayTotalNumberOfElements: true,
                  displayWrongPageNumberError: false,
-                 totalNumberOfElements: this.totalNumberOfElements,
+                 totalNumberOfElements: 0,
                  pageNumber: 1,
                  pravnaUrl: this.pravnaUrl,
                  options: ["WSZYSTKIE", "OCZEKUJE", "MA_R", "NIE_MA_R", "BLEDNA_GRAFIKA"],
+                 selectedEmail: "",
+                 emailName: ""
            }
         },
         watch: {
@@ -124,6 +145,52 @@
             }
         },
         methods: {
+            async setEmail(email_name, email_id) {
+
+                try {
+                    var response = await fetch(this.pravnaUrl + "company/status", {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Access-Control-Allow-Origin": "*",
+                        "Access-Control-Allow-Methods": "*",
+                        "Access-Control-Allow-Headers": "*"
+                    },
+                    body: JSON.stringify({
+                        token: localStorage.getItem('token'),
+                        email: email_name,
+                        id: email_id
+                    }),
+                    }).then(response => response.json())
+                            if (response.data.numberOfElements !== null) {
+                                if (response.data.numberOfElements === 0) {
+                                    if (this.selectedFilter !== "WSZYSTKIE") {
+                                    this.displayEmptyListError = true
+                                    }
+                                    this.displayServerError = false
+                                    this.displayNumberOfElementsError = false
+                                }
+                            }
+                            else {
+                                if (this.pageNumber !== 1) {
+                                this.displayNumberOfElementsError = true
+                                }
+                                this.displayEmptyListError = false
+                            }
+                    }
+                    catch (error) {
+                    //this.errorMessage = error;
+                    console.error('There was an error!', error)
+                    const stringError = String(error)
+                    //this.addingStatus = false
+
+                    if (stringError.includes("Failed to fetch")) {
+                        this.displayServerError = true
+                        }
+                    }
+                    this.getClients()
+                
+            },
             scrollDown() {
                 let element = document.getElementById("scrollHere");
                 element.scrollIntoView({behavior: "smooth", block: "start"});
@@ -137,6 +204,7 @@
                 }
                 this.displayWrongPageNumberError = false 
                 this.displayNumberOfElementsError = false
+                this.displayServerError = false
 
 
                 localStorage.setItem('pageNumber', this.pageNumber)
@@ -159,16 +227,16 @@
 
                     if (response.content.length === 0) {
                         this.displayNumberOfElementsError = true
+                        
                         }
                     else {
                             this.displayNumberOfElementsError = false
                         }
                     }
                     catch (error) {
-                        //this.errorMessage = error;
                         console.error('There was an error!', error)
                         const stringError = String(error)
-                        //this.addingStatus = false
+                        this.displayNumberOfElementsError = false
 
                     if (stringError.includes("Failed to fetch")) {
                         this.displayServerError = true
@@ -185,22 +253,21 @@
                     ClientService.getClients().then((response) =>{
                         try {
                             this.totalNumberOfElements = response.data.totalElements
-                            this.clients = response.data.content;
+                            this.clients = response.data.content
                             this.displayServerError = false
                             this.displayNumberOfElementsError = false
 
                             if (response.data.numberOfElements === 0) {
-                                this.displayEmptyListError = true
+                                if (this.selectedFilter !== "WSZYSTKIE") {
+                                    this.displayEmptyListError = true
+                                }
                                 this.displayServerError = false
-                                this.displayNumberOfElementsError = true
-                            }
-                            else if (response.data.numberOfElements === 0){
                                 this.displayNumberOfElementsError = false
-                                this.displayEmptyListError = true
                             }
-                            else{
+                            if (response.data.numberOfElements){
                                 this.displayNumberOfElementsError = true
                                 this.displayEmptyListError = false
+                                this.displayServerError = false
                             }
                         }
                         catch {
@@ -241,10 +308,12 @@
                         id: id
                     }),
                     }).then(response => response.json())
-                            if (response.data.numberOfElements === 0) {
-                                this.displayEmptyListError = true
-                                this.displayServerError = false
-                                this.displayNumberOfElementsError = false
+                            if (response.data.numberOfElements !== null) {
+                                if (response.data.numberOfElements === 0) {
+                                    this.displayEmptyListError = true
+                                    this.displayServerError = false
+                                    this.displayNumberOfElementsError = false
+                                }
                             }
                             else {
                                 this.displayNumberOfElementsError = true
@@ -283,6 +352,40 @@
 <style src="../assets/css/vue-multiselect.min.css"></style>
 
   <style>
+
+.accept-email {
+    font-size: 15px;
+    float: right;
+    color: black;
+    justify-content: center;
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+    width: 100%;
+}
+  .accept-email:hover {
+    text-decoration: underline;
+    cursor: pointer;
+  }
+    .changeStatusBtn {
+        display: inline-block;
+        font-weight: 400;
+        width: 100%;
+        color: #212529;
+        text-align: center;
+        vertical-align: middle;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        user-select: none;
+        background-color: transparent;
+        border: 1px solid transparent;
+        padding: 0.375rem 0.75rem;
+        font-size: 1rem;
+        line-height: 1.5;
+        border-radius: 0.25rem;
+        transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+    }
     div {
         margin-left : 20px;
     }
@@ -326,14 +429,17 @@
     }
     .noActionRed {
         background-color: #bf9494;
+        width: 100px;
         color: white
     }
     .noActionOrange {
         background-color: #D8B083;
+        width: 140px;
         color: white
     }
     .noActionGreen {
         background-color: #75816b;
+        width: 100px;
         color: white
     }
     h1 {
