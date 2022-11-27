@@ -32,8 +32,8 @@
         <div v-if="displayServerError" class="display-error">  Problem z serwerem </div>
         <div v-if="!displayEmptyListError" class="display-error"></div>
         <div v-if="displayEmptyListError" class="display-error">  Brak firm z danym statusem </div>
-        <div v-if="displayNumberOfElementsError" class="display-error"></div>
-        <div v-if="!displayNumberOfElementsError" class="display-error">  Nie można zmienić strony, strona byłaby pusta </div>
+        <div v-if="!displayNumberOfElementsError" class="display-error"></div>
+        <div v-if="displayNumberOfElementsError" class="display-error">  Nie można zmienić strony, strona byłaby pusta </div>
         <div v-if="!displayWrongPageNumberError" class="display-error"></div>
         <div v-if="displayWrongPageNumberError" class="display-error">  Wpisano niepoprawny numer strony </div>
         <div v-if='displayTotalNumberOfElements' class="display-total-elements"> Liczba elementów dla {{ selectedFilter }}: {{totalNumberOfElements}}</div>
@@ -131,7 +131,7 @@
                  totalNumberOfElements: 0,
                  pageNumber: 1,
                  pravnaUrl: this.pravnaUrl,
-                 options: ["WSZYSTKIE", "OCZEKUJE", "MA_R", "NIE_MA_R", "BLEDNA_GRAFIKA"],
+                 options: ["WSZYSTKIE", "OCZEKUJE", "MA_R", "NIE_MA_R", "BLEDNA_GRAFIKA", "WYSŁANO_MAILA"],
                  selectedEmail: "",
                  emailName: ""
            }
@@ -162,30 +162,30 @@
                         id: email_id
                     }),
                     }).then(response => response.json())
+                        if (response.data !== null || response.data !== undefined) {
                             if (response.data.numberOfElements !== null) {
                                 if (response.data.numberOfElements === 0) {
                                     if (this.selectedFilter !== "WSZYSTKIE") {
-                                    this.displayEmptyListError = true
+                                        this.displayEmptyListError = true
                                     }
                                     this.displayServerError = false
                                     this.displayNumberOfElementsError = false
                                 }
                             }
-                            else {
+                            if (response.data.numberOfElements === 0 || response.data.numberOfElements === null) {      
                                 if (this.pageNumber !== 1) {
-                                this.displayNumberOfElementsError = true
+                                    this.displayNumberOfElementsError = true
                                 }
                                 this.displayEmptyListError = false
                             }
+                        }
                     }
                     catch (error) {
-                    //this.errorMessage = error;
-                    console.error('There was an error!', error)
-                    const stringError = String(error)
-                    //this.addingStatus = false
+                        console.error('There was an error!', error)
+                        const stringError = String(error)
 
-                    if (stringError.includes("Failed to fetch")) {
-                        this.displayServerError = true
+                        if (stringError.includes("Failed to fetch")) {
+                            this.displayServerError = true
                         }
                     }
                     this.getClients()
@@ -196,16 +196,13 @@
                 element.scrollIntoView({behavior: "smooth", block: "start"});
             },
             async setPage() {
-                
-                if (this.pageNumber < 1 || this.pageNumber === null || this.pageNumber === undefined || this.pageNumber === "" || isNaN(this.pageNumber)) {
-                    this.displayWrongPageNumberError = true
-                    this.displayNumberOfElementsError = false
-                    return
-                }
-                this.displayWrongPageNumberError = false 
                 this.displayNumberOfElementsError = false
                 this.displayServerError = false
 
+                if (this.pageNumber < 1 || this.pageNumber === null || this.pageNumber === undefined || this.pageNumber === "" || isNaN(this.pageNumber)) {
+                    this.displayWrongPageNumberError = true
+                    return
+                }
 
                 localStorage.setItem('pageNumber', this.pageNumber)
                 
@@ -224,24 +221,16 @@
                         pageNumber: this.pageNumber
                     }),
                     }).then(response => response.json())
-
-                    if (response.content.length === 0) {
-                        this.displayNumberOfElementsError = true
-                        
-                        }
-                    else {
-                            this.displayNumberOfElementsError = false
+                        if (response.content.length === 0) {
+                            if (this.pageNumber !== 1) {
+                                this.displayNumberOfElementsError = true
+                            }
                         }
                     }
                     catch (error) {
                         console.error('There was an error!', error)
                         const stringError = String(error)
-                        this.displayNumberOfElementsError = false
-
-                    if (stringError.includes("Failed to fetch")) {
                         this.displayServerError = true
-                        this.displayNumberOfElementsError = false
-                        }
                     }
 
                     this.getClients()
@@ -250,30 +239,33 @@
                 window.open(page)
             },
             getClients() {
+                this.displayServerError = false
+                this.displayNumberOfElementsError = false
+                this.displayEmptyListError = false
+
+                
                     ClientService.getClients().then((response) =>{
                         try {
                             this.totalNumberOfElements = response.data.totalElements
                             this.clients = response.data.content
-                            this.displayServerError = false
-                            this.displayNumberOfElementsError = false
 
+
+                            if (response.data.numberOfElements === null){
+                                if (this.pageNumber !== 1) {
+                                    this.displayNumberOfElementsError = true
+                                }
+                            }
                             if (response.data.numberOfElements === 0) {
-                                if (this.selectedFilter !== "WSZYSTKIE") {
+                                if (this.pageNumber === 1) {
                                     this.displayEmptyListError = true
                                 }
-                                this.displayServerError = false
-                                this.displayNumberOfElementsError = false
-                            }
-                            if (response.data.numberOfElements){
-                                this.displayNumberOfElementsError = true
-                                this.displayEmptyListError = false
-                                this.displayServerError = false
-                            }
+                                if (this.pageNumber !== 1) {
+                                    this.displayNumberOfElementsError = true
+                                 }
+                            }   
                         }
                         catch {
                             this.displayServerError = true
-                            this.displayEmptyListError = false
-                            this.displayNumberOfElementsError = false
                         }
                     })
             },
@@ -292,6 +284,9 @@
                 }
             },
             async sendStatusInfo(status, id) {
+                this.displayServerError = false
+                this.displayNumberOfElementsError = false
+                this.displayEmptyListError = false
 
                 try {
                     var response = await fetch(this.pravnaUrl + "company/status", {
@@ -308,16 +303,20 @@
                         id: id
                     }),
                     }).then(response => response.json())
-                            if (response.data.numberOfElements !== null) {
+                        if (response.data !== null || response.data !== undefined) {
+                            if (response.data.numberOfElements !== null ) {
                                 if (response.data.numberOfElements === 0) {
-                                    this.displayEmptyListError = true
-                                    this.displayServerError = false
-                                    this.displayNumberOfElementsError = false
+                                    if (this.pageNumber === 1) {
+                                        this.displayEmptyListError = true
+                                    }
+                                    else {
+                                        this.displayNumberOfElementsError = true
+                                    }
                                 }
                             }
+                        }
                             else {
-                                this.displayNumberOfElementsError = true
-                                this.displayEmptyListError = false
+
                             }
                     }
                     catch (error) {

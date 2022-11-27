@@ -39,6 +39,9 @@
         <button type="submit" v-if="addingStatus" class="my-btn">Dodawanie...</button>
       </div>
     </form>
+    <div class="resetButton" @click="reloadPage" v-if="displayImportPage">
+          By dodać kolejny plik, najpierw kliknij mnie
+        </div>
     <div class="importPanel">
       <h4>
         Import z pliku
@@ -71,9 +74,6 @@
         <router-link to="/view-list" class="redirectToViewList">
           <button class="view-btn float-right">Wyświetl listę</button>
         </router-link>
-        <div class="resetButton" @click="reloadPage">
-          By dodać nowy plik/URL, kliknij mnie w celu odświeżenia strony
-        </div>
       </div>
       <div class="scroll-pad" id="scrollHere"> </div>
   </div>
@@ -84,6 +84,7 @@
 
 <script>
   
+
   export default {
   data () {
     return {
@@ -100,12 +101,28 @@
       importCanceledItemsNumbers: "",
       importCanceledItems: [],
       importAcceptedItemsNumbers: "",
-      pravnaUrl: this.pravnaUrl
+      pravnaUrl: "http://54.37.234.76:8081/"
     }
   },
   methods: {
     reloadPage() {
       location.reload()
+    },
+    checkImportStatus (response) {
+      if (response.status === 'GOTOWE') {
+                  this.importAcceptedItemsNumbers = response.iloscZaakceptowanych
+                  this.importCanceledItemsNumbers = response.iloscOdrzuconych
+                  this.importCanceledItems = response.odrzucone
+                  this.scrollToId()
+                if (this.importCanceledItemsNumbers === 0) {
+                  this.importCanceledItems.push("Brak stron odrzuconych")
+                }
+                this.addingStatus = false
+                return false 
+              }
+      else {
+        return true
+      }
     },
     scrollToId() {
       let element = document.getElementById("scrollHere");
@@ -117,7 +134,7 @@
       while (continueChecking) {
         try {
             var urlId = localStorage.getItem('importId')
-            var response = await fetch(this.pravnaUrl + "import/status/"+ urlId , {
+            var response = await fetch("http://54.37.234.76:8081/" + "import/status/"+ urlId , {
             method: "GET",
             headers: {
               "Content-Type": "application/json",
@@ -127,23 +144,10 @@
             }
             }).then(response => response.json()) 
 
-              setTimeout(() => {
-              console.log("Delayed for 1 second.");
-              }, 5000)
-          
-            if (response.status === 'GOTOWE') {
-              console.log(response.id)
-              this.importAcceptedItemsNumbers = response.iloscZaakceptowanych
-              this.importCanceledItemsNumbers = response.iloscOdrzuconych
-              this.importCanceledItems = response.odrzucone
-              this.scrollToId()
-              if (this.importCanceledItemsNumbers === 0) {
-                this.importCanceledItems.push("Brak stron odrzuconych")
+              setTimeout(this.checkImportStatus(response), 1000);
+              if (this.addingStatus === false) {
+                continueChecking = false
               }
-              this.addingStatus = false
-              continueChecking = false
-
-            }
           }
           catch (error) {
             this.errorMessage = error;
@@ -163,7 +167,7 @@
             let resultTab = []
             resultTab = e.currentTarget.result
               try {
-                var response = await fetch(this.pravnaUrl + "company/add-multiple", {
+                var response = await fetch("http://54.37.234.76:8081/" + "company/add-multiple", {
                 method: "POST",
                 headers: {
                   "Content-Type": "application/json",
