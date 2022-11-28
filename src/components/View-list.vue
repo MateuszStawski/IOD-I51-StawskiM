@@ -58,7 +58,7 @@
                     <td>{{client.phoneNumber}}</td>
                     <td v-if="client.emails.length!==0 && client.status === 'NIE_MA_R'">
                         <multiselect 
-                            v-model="emailName" 
+                            v-model="emailName[client.id]" 
                             :options="client.emails"
                             placeholder="Wybierz email"
                             :select-label="selectName"
@@ -68,7 +68,7 @@
                             :searchable="false"
                         >
                         </multiselect>
-                        <div class="accept-email" @click="setEmail(emailName, client.id)">Potwierdź</div>
+                        <div class="accept-email" @click="setEmail(emailName[client.id], client.id)">Potwierdź</div>
                     </td>
                     <td v-if="client.emails.length === 0 && client.status === 'NIE_MA_R'">
                         NOT FOUND
@@ -133,7 +133,7 @@
                  pravnaUrl: this.pravnaUrl,
                  options: ["WSZYSTKIE", "OCZEKUJE", "MA_R", "NIE_MA_R", "BLEDNA_GRAFIKA", "WYSŁANO_MAILA"],
                  selectedEmail: "",
-                 emailName: ""
+                 emailName: new Array(100000)
            }
         },
         watch: {
@@ -146,6 +146,11 @@
         },
         methods: {
             async setEmail(email_name, email_id) {
+                this.emailName[email_id] = email_name
+
+                if (email_name === undefined) {
+                    return
+                }
 
                 try {
                     var response = await fetch(this.pravnaUrl + "company/status", {
@@ -162,23 +167,6 @@
                         id: email_id
                     }),
                     }).then(response => response.json())
-                        if (response.data !== null || response.data !== undefined) {
-                            if (response.data.numberOfElements !== null) {
-                                if (response.data.numberOfElements === 0) {
-                                    if (this.selectedFilter !== "WSZYSTKIE") {
-                                        this.displayEmptyListError = true
-                                    }
-                                    this.displayServerError = false
-                                    this.displayNumberOfElementsError = false
-                                }
-                            }
-                            if (response.data.numberOfElements === 0 || response.data.numberOfElements === null) {      
-                                if (this.pageNumber !== 1) {
-                                    this.displayNumberOfElementsError = true
-                                }
-                                this.displayEmptyListError = false
-                            }
-                        }
                     }
                     catch (error) {
                         console.error('There was an error!', error)
@@ -303,21 +291,6 @@
                         id: id
                     }),
                     }).then(response => response.json())
-                        if (response.data !== null || response.data !== undefined) {
-                            if (response.data.numberOfElements !== null ) {
-                                if (response.data.numberOfElements === 0) {
-                                    if (this.pageNumber === 1) {
-                                        this.displayEmptyListError = true
-                                    }
-                                    else {
-                                        this.displayNumberOfElementsError = true
-                                    }
-                                }
-                            }
-                        }
-                            else {
-
-                            }
                     }
                     catch (error) {
                     //this.errorMessage = error;
