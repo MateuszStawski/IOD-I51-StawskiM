@@ -134,13 +134,6 @@
           body: this.userString,
           }).then(response => response.json())
           
-          /*
-          if (typeOfAction === "minifier")
-            var receivedResponse = JSON.stringify(response)
-            this.invalidJsonStatus = false
-            this.createResponseOutput = true
-            this.receivedJson = receivedResponse
-          */
 
           this.invalidJsonStatus = false
           this.createResponseOutput = true
