@@ -8,10 +8,6 @@ import '@/assets/css/main.css'
 
 let app = createApp(App)
 
-// app.config.globalProperties.pravnaUrl = 'http://localhost:8081/'
-app.config.globalProperties.pravnaUrl = 'http://54.37.234.76:8081/'
-
-
 app.use(router)
     .mount('#app')
     .use(router)

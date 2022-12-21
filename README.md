@@ -1,9 +1,4 @@
-# Pravna frontend
-
-<b>Website url:<b>
-
-
-
+# IO Project Frontend
 
 ## Project setup
 ```

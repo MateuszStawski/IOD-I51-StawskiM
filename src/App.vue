@@ -1,16 +1,14 @@
 <template>
-  <div class="vue-template" @mouseover="updateLoginButton">
+  <div class="vue-template">
     <!-- Navigation -->
     <nav class="navbar shadow bg-white rounded justify-content-between flex-nowrap flex-row fixed-top">
       <div class="container">
         <ul class="nav navbar-nav flex-row float-left">
           <li class="nav-item">
-            <router-link v-if="showLogoutButton" class="nav-link pr-3" to="/main">Strona główna</router-link>
           </li>
         </ul>
         <ul class="nav navbar-nav flex-row float-right">
           <li class="nav-item">
-            <router-link v-if="showLogoutButton" class="nav-link pr-3" to="/log-in" @click="clearSessionStorage">Wyloguj</router-link>
           </li>
         </ul>
       </div>
@@ -25,42 +23,6 @@
     </div>
   </div>
 </template>
-
-<script>
-
- export default {
-
-  data() {
-    return {
-      showLogoutButton: true
-      }
-  },
-    methods: {
-      updateLoginButton() {
-            const checkURL = String(window.location.href)
-
-            if (checkURL.includes("log-in")) {
-              this.showLogoutButton = false
-            }
-            else {
-              this.showLogoutButton = true
-            }
-          },
-      clearSessionStorage () {
-             localStorage.removeItem('token');
-          }
-      },
-    mounted:function() {
-      const checkURL = String(window.location.href)
-      if (checkURL.includes("log-in")) {
-        this.showLogoutButton = false
-        }
-      },
- }
-  
-
-
-</script>
 
 
 <style>
@@ -79,9 +41,8 @@ a, li {
 position: absolute;
 top: 50%;
 left: 50%;
-transform: translate(-50%, -50%);
+transform: translate(-75%, -50%);
 }
-
 
 .box {
   display: flex;

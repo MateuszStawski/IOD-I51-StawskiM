@@ -2,7 +2,7 @@
     box-sizing: border-box;
   }
   body {
-    background: #62478a !important;
+    background: lightgreen;
     min-height: 100vh;
     display: flex;
     font-weight: 400;
@@ -12,12 +12,12 @@
   .App,
   .vue-template,
   .vertical-center {
-    width: 1650px;
+    width: 800px;
     height: 100%;
   }
   .containerDisplay {
     height: fit-content;
-    min-height: 400px;
+    min-height: 1000px;
   }
   .nav {
     margin-bottom: auto;
@@ -34,8 +34,8 @@
   }
   .inner-block {
     margin-top: 100px;
-    min-width: 1850px;
-    max-width: 1850px;
+    min-width: 1200px;
+    max-width: 1200px;
     margin-bottom: 30px;
     width: fit-content;
     background: #ffffff;
