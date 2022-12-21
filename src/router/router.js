@@ -4,6 +4,10 @@ import Mainview from '../components/Main-view.vue'
 
 const routes = [
     {
+        path: '/',
+        redirect: '/main-view'
+    },
+    {
         path: '/main-view',
         name: 'Mainview',
         component: Mainview
