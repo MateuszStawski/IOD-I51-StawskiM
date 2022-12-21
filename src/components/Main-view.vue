@@ -335,6 +335,12 @@
 select {
   margin-bottom: 2%;
 }
+.exception-tab:hover {
+  color: #808080;
+}
+.json-tab:hover {
+  color: #808080;
 
+}
 </style>
 
